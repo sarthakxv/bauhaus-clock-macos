@@ -22,7 +22,9 @@ bauhaus-clock-macos/
 │   ├── ClockRenderer.swift         # Pure Core Graphics rendering engine
 │   ├── Palettes.swift              # NSColor palette definitions (16 dials)
 │   └── Info.plist
-├── build.sh                        # One-command build (no Xcode required)
+├── preview.swift                   # Standalone preview app with settings HUD
+├── build.sh                        # Build .saver bundle (no Xcode required)
+├── build-preview.sh                # Build preview app for fast iteration
 └── project.yml                     # XcodeGen spec (optional, for IDE use)
 ```
 
@@ -41,7 +43,25 @@ bauhaus-clock-macos/
 
 Output: `build/BauhausClock.saver`
 
-### Install
+### Preview app (fast iteration)
+
+For development, use the standalone preview app instead of installing the screensaver:
+
+```bash
+./build-preview.sh && ./build/BauhausPreview
+```
+
+This opens a resizable window with the clock rendering live at 60fps. Click the **gear icon** in the toolbar to open a floating settings panel where you can switch dials, toggle night mode, change lume colors, size, and seconds — all in real time.
+
+CLI flags also work:
+
+```bash
+./build/BauhausPreview --dial Turquoise
+./build/BauhausPreview --night --lume Amber
+./build/BauhausPreview --compact --no-seconds
+```
+
+### Install screensaver
 
 ```bash
 open build/BauhausClock.saver
