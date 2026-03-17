@@ -5,7 +5,6 @@ import CoreText
 // MARK: - Clock Renderer (Pure Core Graphics)
 
 final class ClockRenderer {
-
     // MARK: - Hand Geometry
 
     /// Creates a leaf/lozenge hand path (pointed tip, wider middle, tapered base)
@@ -66,7 +65,7 @@ final class ClockRenderer {
     // MARK: - Main Draw
 
     static func draw(in ctx: CGContext, size: CGSize, pal: ClockPalette, now: Date,
-                     movement: String, clockSize: String, showSeconds: Bool, night: Bool) {
+                     clockSize: String, showSeconds: Bool, night: Bool) {
 
         let sz: CGFloat = clockSize == "Compact" ? 360 : 480
         let scale = min(size.width, size.height) / sz
@@ -87,18 +86,11 @@ final class ClockRenderer {
         let s = CGFloat(cal.component(.second, from: now))
         let ms = CGFloat(cal.component(.nanosecond, from: now)) / 1_000_000
 
-        let hourA = h * 30 + m * 0.5 + s * (0.5 / 60)
-        let minA = m * 6 + s * 0.1
-
-        let secA: CGFloat
-        switch movement {
-        case "Quartz":
-            secA = s * 6
-        case "Mechanical":
-            secA = CGFloat(Int((s * 1000 + ms) / 125)) * 0.75
-        default: // Digital
-            secA = s * 6 + (ms / 1000) * 6
-        }
+        // Mechanical sweep — smooth continuous motion like a high-beat movement
+        let sFrac = s + ms / 1000          // fractional seconds (0–59.999)
+        let secA  = sFrac * 6              // 6° per second, smooth
+        let minA  = m * 6 + sFrac * 0.1    // 0.1° per second advance
+        let hourA = h * 30 + m * 0.5 + sFrac * (0.5 / 60)
 
         // ── Minute Ticks ──
         drawMinuteTicks(ctx, cx: cx, cy: cy, fR: fR, pal: pal, night: night)

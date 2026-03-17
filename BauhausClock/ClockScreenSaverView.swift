@@ -13,7 +13,6 @@ class ClockScreenSaverView: ScreenSaverView {
         let d = ScreenSaverDefaults(forModuleWithName: id)
         d?.register(defaults: [
             "dial": "Noir",
-            "movement": "Mechanical",
             "size": "Classic",
             "night": false,
             "lume": "Tritium Green",
@@ -25,7 +24,6 @@ class ClockScreenSaverView: ScreenSaverView {
     // MARK: - Settings Accessors
 
     private var dialName: String { defaults?.string(forKey: "dial") ?? "Noir" }
-    private var movement: String { defaults?.string(forKey: "movement") ?? "Mechanical" }
     private var clockSize: String { defaults?.string(forKey: "size") ?? "Classic" }
     private var isNight: Bool { defaults?.bool(forKey: "night") ?? false }
     private var lumeName: String { defaults?.string(forKey: "lume") ?? "Tritium Green" }
@@ -92,7 +90,6 @@ class ClockScreenSaverView: ScreenSaverView {
             size: bounds.size,
             pal: pal,
             now: now,
-            movement: movement,
             clockSize: clockSize,
             showSeconds: showSeconds,
             night: isNight
