@@ -65,7 +65,8 @@ final class ClockRenderer {
     // MARK: - Main Draw
 
     static func draw(in ctx: CGContext, size: CGSize, pal: ClockPalette, now: Date,
-                     clockSize: String, showSeconds: Bool, night: Bool) {
+                     clockSize: String, showSeconds: Bool, night: Bool,
+                     movement: String = "Mechanical") {
 
         let sz: CGFloat = clockSize == "Compact" ? 360 : 480
         let scale = min(size.width, size.height) / sz
@@ -86,10 +87,21 @@ final class ClockRenderer {
         let s = CGFloat(cal.component(.second, from: now))
         let ms = CGFloat(cal.component(.nanosecond, from: now)) / 1_000_000
 
-        // Mechanical sweep — smooth continuous motion like a high-beat movement
-        let sFrac = s + ms / 1000          // fractional seconds (0–59.999)
-        let secA  = sFrac * 6              // 6° per second, smooth
-        let minA  = m * 6 + sFrac * 0.1    // 0.1° per second advance
+        let sFrac = s + ms / 1000
+
+        // Second hand angle depends on movement type
+        let secA: CGFloat
+        switch movement {
+        case "Quartz":
+            secA = s * 6                              // discrete 1Hz tick
+        case "Digital":
+            secA = sFrac * 6                          // fully smooth
+        default: // Mechanical — 8 steps/sec (28,800 bph)
+            let totalMs = s * 1000 + ms
+            secA = floor(totalMs / 125) * 0.75
+        }
+
+        let minA  = m * 6 + sFrac * 0.1
         let hourA = h * 30 + m * 0.5 + sFrac * (0.5 / 60)
 
         // ── Minute Ticks ──

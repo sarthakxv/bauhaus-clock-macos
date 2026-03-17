@@ -12,9 +12,10 @@ class ClockScreenSaverView: ScreenSaverView {
         guard let id = Bundle(for: type(of: self)).bundleIdentifier else { return nil }
         let d = ScreenSaverDefaults(forModuleWithName: id)
         d?.register(defaults: [
+            "appearance": "night",
             "dial": "Noir",
             "size": "Classic",
-            "night": false,
+            "movement": "Mechanical",
             "lume": "Tritium Green",
             "seconds": true,
         ])
@@ -25,9 +26,19 @@ class ClockScreenSaverView: ScreenSaverView {
 
     private var dialName: String { defaults?.string(forKey: "dial") ?? "Noir" }
     private var clockSize: String { defaults?.string(forKey: "size") ?? "Classic" }
-    private var isNight: Bool { defaults?.bool(forKey: "night") ?? false }
+    private var movementType: String { defaults?.string(forKey: "movement") ?? "Mechanical" }
     private var lumeName: String { defaults?.string(forKey: "lume") ?? "Tritium Green" }
     private var showSeconds: Bool { defaults?.bool(forKey: "seconds") ?? true }
+
+    private var isNight: Bool {
+        let mode = defaults?.string(forKey: "appearance") ?? "night"
+        switch mode {
+        case "day": return false
+        case "system":
+            return effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        default: return true
+        }
+    }
 
     private var palette: ClockPalette {
         if isNight {
@@ -92,7 +103,8 @@ class ClockScreenSaverView: ScreenSaverView {
             now: now,
             clockSize: clockSize,
             showSeconds: showSeconds,
-            night: isNight
+            night: isNight,
+            movement: movementType
         )
 
         ctx.restoreGState()
